@@ -10,7 +10,7 @@ class Window {
         this.width = width
         this.height = height
 
-        this.light = random_bool()
+        this.light = null
     }
 
     draw ({
@@ -18,8 +18,16 @@ class Window {
         canvas,
         x, 
         y,
+        scene,
     }) {
-        if (random() > 0.9999) this.light = !this.light
+        //if (random() > 0.9999) this.light = !this.light
+        this.light = this.light == null || random() > 0.9999
+            ? scene.time > SUNRISE && scene.time < SUNSET
+                ? random() > 0.9
+                : random() > 0.2
+            : random() > 0.9999
+                ? !this.light
+                : this.light
 
         ctx.fillStyle = this.light
             ? 'yellow'

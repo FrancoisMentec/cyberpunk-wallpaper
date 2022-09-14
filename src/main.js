@@ -12,14 +12,13 @@ resize_canvas()
 function generate () {
     window.scene = new Scene({
         width: canvas.width,
-        ground_level: 800
+        ground_level: canvas.height * 2 / 3
     })
 }
 
 generate()
 
 function draw () {
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
     scene.draw({
         ctx: ctx,
         canvas: canvas

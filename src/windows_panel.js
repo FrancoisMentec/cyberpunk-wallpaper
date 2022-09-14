@@ -8,7 +8,7 @@ class Windows_Panel {
         this.windows_width = Math.random() > 0.7
             ? this.width - this.min_margin * 2
             : random_int(3, Math.min(20, this.width - this.min_margin * 2))
-        this.windows_height = random_int(5, Math.min(10, this.height - this.min_margin * 2))
+        this.windows_height = random_int(3, Math.min(10, this.height - this.min_margin * 2))
 
         this.windows = []
         let n_cols = Math.floor(this.width / (this.windows_width + this.min_margin))
