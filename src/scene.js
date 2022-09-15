@@ -25,22 +25,20 @@ class Scene {
             ground_level: this.buildings_level
         })
 
-        // Generate front buildings
-        this.front_buildings = []
-        for (let i = 0; i < width / 30; i++)
-            this.front_buildings.push(new Building({ x: random_int(-100, width + 100), y: this.buildings_level }))
-        this.front_buildings.sort((a, b) => b.height - a.height)
+        this.building_layers = []
 
-        // Generate back buildings
-        this.back_buildings = []
-        for (let i = 0; i < width / 30; i++)
-            this.back_buildings.push(new Building({
-                x: random_int(-100, width + 100),
-                y: this.buildings_level,
-                windows: false,
-                front_fill: '#333333'
-            }))
-        this.back_buildings.sort((a, b) => b.height - a.height)
+        this.building_layers.push(make_building_layer({
+            width: width,
+            ground_level: this.buildings_level,
+            front_fill: '#240b36',
+            side_fill: ['#c31432', '#240b36'],
+            windows_light_color: 'red'
+        }))
+
+        this.building_layers.push(make_building_layer({
+            width: width,
+            ground_level: this.buildings_level
+        }))
 
         let orbiter_speed = 0.005
 
@@ -96,16 +94,13 @@ class Scene {
 
         // Buildings Skyline
         this.buildings_skyline.draw(draw_arguments)
-
-        // Back buildings
-        for (let building of this.back_buildings) {
-            building.draw(draw_arguments)
-        }
         
         // Buildings
-        for (let building of this.front_buildings) {
-            building.draw(draw_arguments)
-        }
+        this.building_layers.forEach(layer => {
+            layer.forEach(building => {
+                building.draw(draw_arguments)
+            })
+        })
 
         // Ground
         ctx.fillStyle = '#444444'

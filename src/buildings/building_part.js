@@ -1,20 +1,26 @@
-class Building_Layer {
+class Building_Part {
     constructor ({
         width,
         height,
         depth,
         windows = true,
-        front_fill = ['#aa4b6b', '#6b6b83', '#3b8d99']
+        front_fill = ['#aa4b6b', '#6b6b83', '#3b8d99'],
+        side_fill = ['#e1eec3', '#f05053'],
+        windows_light_color = 'yellow'
     }) {
         this.width = width
         this.height = height
         this.depth = depth || Math.min(20, random_int(0.2 * this.width, 0.4 * this.width))
 
         this.windows_panel = windows
-            ? new Windows_Panel({ building_layer: this })
+            ? new Windows_Panel({
+                building_part: this,
+                light_color: windows_light_color
+            })
             : null
 
         this.front_fill = front_fill
+        this.side_fill = side_fill
     }
 
     get total_width () {
@@ -43,10 +49,14 @@ class Building_Layer {
         ctx.fillRect(front_x + this.width, y, shadow_width, this.height);
 
         // Side
-        gradient = ctx.createLinearGradient(side_x, y, side_x + this.depth, y + this.height)
-        gradient.addColorStop(0, '#e1eec3')
-        gradient.addColorStop(1, '#f05053')
-        ctx.fillStyle = gradient
+        if (Array.isArray(this.side_fill)) {
+            let gradient = ctx.createLinearGradient(side_x, y, side_x + this.depth, y + this.height)
+            ctx.fillStyle = add_colors_to_gradient(gradient, this.side_fill)
+        } else {
+            ctx.fillStyle = this.side_fill instanceof Color
+                ? this.side_fill.rgba
+                : this.side_fill
+        }
         ctx.fillRect(side_x, y, this.depth, this.height)
 
         // Front

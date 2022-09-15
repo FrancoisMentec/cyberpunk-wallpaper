@@ -3,12 +3,16 @@ class Window {
         x,
         y,
         width,
-        height
-    }) {
+        height,
+        color = 'gray',
+        light_color = 'yellow'
+    } = {}) {
         this.x = x
         this.y = y
         this.width = width
         this.height = height
+        this.color = color
+        this.light_color = light_color
 
         this.light = null
     }
@@ -30,8 +34,8 @@ class Window {
                 : this.light
 
         ctx.fillStyle = this.light
-            ? 'yellow'
-            : 'gray'
+            ? this.light_color
+            : this.color
 
         ctx.fillRect(x + this.x, y + this.y, this.width, this.height)
     }

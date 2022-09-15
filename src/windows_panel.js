@@ -1,8 +1,9 @@
 class Windows_Panel {
     constructor ({
-        building_layer
+        building_part,
+        light_color = 'yellow'
     }) {
-        this.building_layer = building_layer
+        this.building_part = building_part
 
         this.min_margin = random_int(3, 10)
         this.windows_width = Math.random() > 0.7
@@ -25,7 +26,8 @@ class Windows_Panel {
                     x: window_x,
                     y: window_y,
                     width: this.windows_width,
-                    height: this.windows_height
+                    height: this.windows_height,
+                    light_color
                 }))
                 window_y += this.windows_height + rows_margin
             }
@@ -34,11 +36,11 @@ class Windows_Panel {
     }
 
     get width () {
-        return this.building_layer.width
+        return this.building_part.width
     }
 
     get height () {
-        return this.building_layer.height
+        return this.building_part.height
     }
 
     draw ({
