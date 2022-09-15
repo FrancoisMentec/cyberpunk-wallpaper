@@ -2,11 +2,14 @@ let canvas = document.getElementById('canvas')
 let ctx = canvas.getContext('2d')
 
 function resize_canvas () {
-    canvas.width  = window.innerWidth
-    canvas.height = window.innerHeight
+    canvas.width  = window.innerWidth + 20
+    canvas.height = window.innerHeight + 20
 }
 
-window.addEventListener('resize', e => resize_canvas())
+window.addEventListener('resize', e => {
+    resize_canvas()
+    generate()
+})
 resize_canvas()
 
 function generate () {

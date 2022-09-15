@@ -7,3 +7,9 @@ html, body {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     background-color: black;
 }
+
+canvas {
+    position: relative;
+    top: -10px;
+    left: -10px;
+}

@@ -27,6 +27,22 @@ class Color {
     get rgba () {
         return `rgb(${this.r}, ${this.g}, ${this.b}, ${this.a})`
     }
+
+    get serialize () {
+        return {
+            r: this.r,
+            g: this.g,
+            b: this.b,
+            a: this.a
+        }
+    }
+
+    alpha (value) {
+        return new Color({
+            ...this.serialize,
+            a: value
+        })
+    }
 }
 
 function color_fusion (color_a, color_b, balance) {
@@ -35,6 +51,20 @@ function color_fusion (color_a, color_b, balance) {
     else return new Color({
         r: color_a.r * (1 - balance) + color_b.r * balance,
         g: color_a.g * (1 - balance) + color_b.g * balance,
-        b: color_a.b * (1 - balance) + color_b.b * balance
+        b: color_a.b * (1 - balance) + color_b.b * balance,
+        a: color_a.a * (1 - balance) + color_b.a * balance
     })
+}
+
+function add_colors_to_gradient (gradient, colors) {
+    if (!Array.isArray(colors) || colors.length < 2)
+        throw new Error(`Colors must be an array (${Array.isArray(colors)}) with a length greater or equal to 2`)
+    colors.forEach((color, i) => {
+        gradient.addColorStop(
+            i / (colors.length - 1),
+            color instanceof Color
+                ? color.rgba
+                : color)
+    })
+    return gradient
 }
