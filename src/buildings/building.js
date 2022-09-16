@@ -1,7 +1,11 @@
-const BUILDINGS_MAKERS = [
+let building_makers = [
     {
         make: params => new Regular_Building(params),
-        weight: 1000
+        weight: 800
+    },
+    {
+        make: params => new Tall_Building(params),
+        weight: 300
     },
     {
         make: params => new Skyscraper(params),
@@ -9,14 +13,13 @@ const BUILDINGS_MAKERS = [
     }
 ]
 
-const WEIGHT = BUILDINGS_MAKERS.reduce((p, c) => p + c.weight, 0)
-
 function make_building (params) {
-    let rand = random_int(1, WEIGHT)
+    let rand = random_int(1, building_makers.reduce((p, c) => p + c.weight, 0))
     let i = -1
     let sum = 0
-    while (sum < rand) sum += BUILDINGS_MAKERS[++i].weight
-    return BUILDINGS_MAKERS[i].make(params)
+    while (sum < rand && i < building_makers.length - 1) sum += building_makers[++i].weight
+    let building = building_makers[i].make(params)
+    return building
 }
 
 class Building {
@@ -35,45 +38,9 @@ class Building {
         this.side_fill = side_fill
         this.windows = windows
         this.windows_light_color = windows_light_color
-
-        /*let seed = random()
-
-        if (seed < 0.4) { // Small & large
-            this.parts.push(new Building_Part({
-                width: random_int(30, 100),
-                height: random_int(20, 60),
-                windows: windows,
-                front_fill: front_fill
-            }))
-        } else if (seed < 0.8) { // Regular
-            this.parts.push(new Building_Part({
-                width: random_int(20, 50),
-                height: random_int(50, 150),
-                windows: windows,
-                front_fill: front_fill
-            }))
-        } else if (seed < 0.95) { // Skyscraper
-            this.parts.push(new Building_Part({
-                width: random_int(10, 30),
-                height: random_int(150, 400),
-                windows: windows,
-                front_fill: front_fill
-            }))
-        } else { // Ultra Skyscraper
-            this.parts.push(new Building_Part({
-                width: random_int(10, 20),
-                height: random_int(400, 700),
-                windows: windows,
-                front_fill: front_fill
-            }))
-        }*/ 
     }
 
     get width () {
-        return this.parts[0].width
-    }
-
-    get total_width () {
         return this.parts[0].total_width
     }
 
@@ -123,7 +90,7 @@ function make_building_layer ({
             y: ground_level,
         })
         buildings.push(building)
-        x = building.x + building.width 
+        x = building.x + building.width
     }
     return buildings
 }

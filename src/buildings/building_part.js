@@ -14,14 +14,13 @@ class Building_Part {
         this.depth = typeof depth == 'number'
             ? depth
             : clamp(random_int(0.2 * this.width, 0.4 * this.width), 2, 15)
-
-        this.windows_panel = windows
+        
+        this.windows_panel = windows === true
             ? new Windows_Panel({
                 building_part: this,
                 light_color: windows_light_color
             })
             : null
-
         this.front_fill = front_fill
         this.side_fill = side_fill
 
@@ -40,7 +39,6 @@ class Building_Part {
         y,
     } = {}) {
         let gradient = null
-
         
         let side_x = Math.floor(x - (this.width + this.depth) / 2)
         let front_x = side_x + this.depth

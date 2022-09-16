@@ -4,12 +4,26 @@ class Windows_Panel {
         light_color = 'yellow'
     }) {
         this.building_part = building_part
+        this.light_color = light_color
 
+        if (this.building_part.width > config.windows.min_margin * 2)
+            this.make_panel()
+    }
+
+    get width () {
+        return this.building_part.width
+    }
+
+    get height () {
+        return this.building_part.height
+    }
+
+    make_panel () {
         let full_width = Math.random() > 0.7
 
         this.min_margin = full_width
-            ? random_int(3, 5)
-            : random_int(3, 10)
+            ? random_int(config.windows.min_margin, 5)
+            : random_int(config.windows.min_margin, 10)
         this.windows_width = full_width
             ? this.width - this.min_margin * 2 // full width windows
             : random_int(3,  clamp(this.width - this.min_margin * 2, 6, 20))
@@ -31,20 +45,12 @@ class Windows_Panel {
                     y: window_y,
                     width: this.windows_width,
                     height: this.windows_height,
-                    light_color
+                    light_color: this.light_color
                 }))
                 window_y += this.windows_height + rows_margin
             }
             window_x += this.windows_width + cols_margin
         }
-    }
-
-    get width () {
-        return this.building_part.width
-    }
-
-    get height () {
-        return this.building_part.height
     }
 
     draw ({
@@ -53,6 +59,7 @@ class Windows_Panel {
         x, 
         y,
     }) {
-        this.windows.forEach(window => window.draw(arguments[0]))
+        if (Array.isArray(this.windows))
+            this.windows.forEach(window => window.draw(arguments[0]))
     }
 }

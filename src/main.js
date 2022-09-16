@@ -1,6 +1,9 @@
 let config = {
     sun_radius: 30,
-    moon_radius: 60
+    moon_radius: 60,
+    windows: {
+        min_margin: 3
+    }
 }
 
 let canvas = document.getElementById('canvas')
@@ -20,7 +23,7 @@ resize_canvas()
 function generate () {
     window.scene = new Scene({
         width: canvas.width,
-        ground_level: canvas.height * 2 / 3
+        ground_level: canvas.height * .66
     })
 }
 

@@ -13,10 +13,12 @@ class Skyscraper extends Building {
                 height: random_int(8, 16),
             })
     
-            if (random() > .5) this.make_part({
-                width: random_int(3, clamp(this.parts[1].width * .3, 3, 10)),
-                height: random_int(10, 30),
-            })
+            if (random() > .5) {
+                this.make_part({
+                    width: random_int(3, clamp(this.parts[1].width * .3, 3, 10)),
+                    height: random_int(10, 30),
+                })
+            }
         }
     }
 }
