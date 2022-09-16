@@ -21,3 +21,13 @@ function random_int (a=1, b) {
 function random_bool () {
     return Math.random() >= 0.5
 }
+
+function fill_rect (ctx, x, y, width, height, fill) {
+    if (Array.isArray(fill)) {
+        let gradient = ctx.createLinearGradient(x, y, x + width, y + height)
+        ctx.fillStyle = add_colors_to_gradient(gradient, fill)
+    } else ctx.fillStyle = fill instanceof Color
+        ? fill.rgba
+        : fill
+    ctx.fillRect(x, y, width, height)
+}

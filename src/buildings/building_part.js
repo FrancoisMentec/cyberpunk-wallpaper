@@ -7,7 +7,9 @@ class Building_Part {
         front_fill = ['#aa4b6b', '#6b6b83', '#3b8d99'],
         side_fill = ['#e1eec3', '#f05053'],
         windows_light_color = 'yellow',
-        x_offset = 0
+        x_offset = 0,
+        cap_height = 0,
+        cap_fill = null
     }) {
         this.width = width
         this.height = height
@@ -25,10 +27,21 @@ class Building_Part {
         this.side_fill = side_fill
 
         this.x_offset = x_offset
+
+        this.cap_height = cap_height
+        this.cap_fill = cap_fill == null
+            ? Array.isArray(this.side_fill)
+                ? this.side_fill[0]
+                : this.side_fill
+            : cap_fill
     }
 
     get total_width () {
         return this.width + this.depth
+    }
+
+    get total_height () {
+        return this.height + this.cap_height
     }
 
     draw ({
@@ -46,35 +59,14 @@ class Building_Part {
 
         // Shadow
         let shadow_width = Math.max(1, this.depth * (((Math.cos(scene.sun.angle) * -1) + 1) / 2))
-        gradient = ctx.createLinearGradient(front_x + this.width, 0, front_x + this.width + shadow_width, 0)
-        gradient.addColorStop(0, 'rgba(0,0,0,0.6)')
-        gradient.addColorStop(1, 'transparent')
-        ctx.fillStyle = gradient
-        ctx.fillRect(front_x + this.width, y, shadow_width, this.height);
+        fill_rect(ctx, front_x + this.width, y, shadow_width, this.height, ['rgba(0,0,0,0.6)', 'transparent']);
 
         // Side
-        if (this.depth > 0) {
-            if (Array.isArray(this.side_fill)) {
-                let gradient = ctx.createLinearGradient(side_x, y, side_x + this.depth, y + this.height)
-                ctx.fillStyle = add_colors_to_gradient(gradient, this.side_fill)
-            } else {
-                ctx.fillStyle = this.side_fill instanceof Color
-                    ? this.side_fill.rgba
-                    : this.side_fill
-            }
-            ctx.fillRect(side_x, y, this.depth, this.height)
-        }
+        if (this.depth > 0)
+            fill_rect(ctx, side_x, y, this.depth, this.height, this.side_fill)
 
         // Front
-        if (Array.isArray(this.front_fill)) {
-            let gradient = ctx.createLinearGradient(front_x, y, front_x + this.width, y + this.height)
-            ctx.fillStyle = add_colors_to_gradient(gradient, this.front_fill)
-        } else {
-            ctx.fillStyle = this.front_fill instanceof Color
-                ? this.front_fill.rgba
-                : this.front_fill
-        }
-        ctx.fillRect(front_x, y, this.width, this.height)
+        fill_rect(ctx, front_x, y, this.width, this.height, this.front_fill)
 
         // Windows
         if (this.windows_panel) this.windows_panel.draw({
@@ -83,5 +75,8 @@ class Building_Part {
             y: y
         })
 
+        // Cap
+        if (this.cap_height > 0)
+            fill_rect(ctx, side_x, y - this.cap_height, this.total_width, this.cap_height, this.cap_fill)
     }
 }
