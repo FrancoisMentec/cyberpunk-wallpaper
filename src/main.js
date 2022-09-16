@@ -1,3 +1,8 @@
+let config = {
+    sun_radius: 30,
+    moon_radius: 60
+}
+
 let canvas = document.getElementById('canvas')
 let ctx = canvas.getContext('2d')
 

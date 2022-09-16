@@ -6,11 +6,14 @@ class Building_Part {
         windows = true,
         front_fill = ['#aa4b6b', '#6b6b83', '#3b8d99'],
         side_fill = ['#e1eec3', '#f05053'],
-        windows_light_color = 'yellow'
+        windows_light_color = 'yellow',
+        x_offset = 0
     }) {
         this.width = width
         this.height = height
-        this.depth = depth || Math.min(20, random_int(0.2 * this.width, 0.4 * this.width))
+        this.depth = typeof depth == 'number'
+            ? depth
+            : clamp(random_int(0.2 * this.width, 0.4 * this.width), 2, 15)
 
         this.windows_panel = windows
             ? new Windows_Panel({
@@ -21,6 +24,8 @@ class Building_Part {
 
         this.front_fill = front_fill
         this.side_fill = side_fill
+
+        this.x_offset = x_offset
     }
 
     get total_width () {
@@ -36,8 +41,9 @@ class Building_Part {
     } = {}) {
         let gradient = null
 
-        let front_x = Math.floor(x - this.width / 2)
-        let side_x = Math.ceil(x - this.width / 2 - this.depth)
+        
+        let side_x = Math.floor(x - (this.width + this.depth) / 2)
+        let front_x = side_x + this.depth
         y -= this.height
 
         // Shadow
@@ -49,15 +55,17 @@ class Building_Part {
         ctx.fillRect(front_x + this.width, y, shadow_width, this.height);
 
         // Side
-        if (Array.isArray(this.side_fill)) {
-            let gradient = ctx.createLinearGradient(side_x, y, side_x + this.depth, y + this.height)
-            ctx.fillStyle = add_colors_to_gradient(gradient, this.side_fill)
-        } else {
-            ctx.fillStyle = this.side_fill instanceof Color
-                ? this.side_fill.rgba
-                : this.side_fill
+        if (this.depth > 0) {
+            if (Array.isArray(this.side_fill)) {
+                let gradient = ctx.createLinearGradient(side_x, y, side_x + this.depth, y + this.height)
+                ctx.fillStyle = add_colors_to_gradient(gradient, this.side_fill)
+            } else {
+                ctx.fillStyle = this.side_fill instanceof Color
+                    ? this.side_fill.rgba
+                    : this.side_fill
+            }
+            ctx.fillRect(side_x, y, this.depth, this.height)
         }
-        ctx.fillRect(side_x, y, this.depth, this.height)
 
         // Front
         if (Array.isArray(this.front_fill)) {

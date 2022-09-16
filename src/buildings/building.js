@@ -73,24 +73,21 @@ class Building {
         return this.parts[0].width
     }
 
+    get total_width () {
+        return this.parts[0].total_width
+    }
+
     get height () {
         return this.parts.reduce((sum, part) => sum + part.height, 0)
     }
 
-    make_part ({
-        width,
-        height,
-        windows
-    } = {}) {
+    make_part (params) {
         this.parts.push(new Building_Part({
-            width,
-            height,
             front_fill: this.front_fill,
             side_fill: this.side_fill,
             windows_light_color: this.windows_light_color,
-            windows: typeof windows == 'boolean'
-                ? windows
-                : this.windows
+            windows: this.windows,
+            ...params
         }))
     }
 

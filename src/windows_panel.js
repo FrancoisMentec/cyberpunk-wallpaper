@@ -5,11 +5,15 @@ class Windows_Panel {
     }) {
         this.building_part = building_part
 
-        this.min_margin = random_int(3, 10)
-        this.windows_width = Math.random() > 0.7
-            ? this.width - this.min_margin * 2
-            : random_int(3, Math.min(20, this.width - this.min_margin * 2))
-        this.windows_height = random_int(3, Math.min(10, this.height - this.min_margin * 2))
+        let full_width = Math.random() > 0.7
+
+        this.min_margin = full_width
+            ? random_int(3, 5)
+            : random_int(3, 10)
+        this.windows_width = full_width
+            ? this.width - this.min_margin * 2 // full width windows
+            : random_int(3,  clamp(this.width - this.min_margin * 2, 6, 20))
+        this.windows_height = random_int(3, clamp(this.height - this.min_margin * 2, 6, 15))
 
         this.windows = []
         let n_cols = Math.floor(this.width / (this.windows_width + this.min_margin))

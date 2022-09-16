@@ -43,6 +43,15 @@ class Color {
             a: value
         })
     }
+
+    multiply (value) {
+        return new Color({
+            r: Math.max(0, Math.min(255, this.r * value)),
+            g: Math.max(0, Math.min(255, this.g * value)),
+            b: Math.max(0, Math.min(255, this.b * value)),
+            a: this.a,
+        })
+    }
 }
 
 function color_fusion (color_a, color_b, balance) {

@@ -16,7 +16,9 @@ class Buildings_Skyline {
         while (current_width < width) {
             let building = {
                 x: current_width,
-                width: random_int(min_building_width, Math.min(max_building_width, width - current_width)),
+                width: width - current_width <= min_building_width
+                    ? width - current_width
+                    : random_int(min_building_width, Math.min(max_building_width, width - current_width)),
                 height: random_int(min_heigth, max_heigth),
             }
             this.buildings.push(building)

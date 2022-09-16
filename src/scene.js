@@ -45,21 +45,21 @@ class Scene {
         this.sun = new Orbiter({
             orbit_center_x: canvas.width / 2,
             orbit_center_y: this.ground_level,
-            orbit_radius: Math.min(canvas.width / 2 - 40, this.ground_level - 40),
+            orbit_radius: Math.min(canvas.width / 2 - 40, this.ground_level - config.sun_radius - 20),
             starting_angle: Math.PI,
             speed: orbiter_speed,
             color: 'yellow',
-            radius: 20
+            radius: config.sun_radius
         })
 
         this.moon = new Orbiter({
             orbit_center_x: canvas.width / 2,
             orbit_center_y: this.ground_level,
-            orbit_radius: Math.min(canvas.width / 2 - 80, this.ground_level - 60),
+            orbit_radius: Math.min(canvas.width / 2 - 80, this.ground_level - config.moon_radius - 20),
             starting_angle: 0,
             speed: orbiter_speed,
             color: 'gray',
-            radius: 60
+            radius: config.moon_radius
         })
 
         this.time = NOON
@@ -83,9 +83,13 @@ class Scene {
         }
 
         // Sky
-        ctx.fillStyle = this.time > SUNRISE && this.time < SUNSET
-            ? color_fusion(NIGHT_SKY, DAY_SKY, Math.sin(this.sun.angle) * 2).rgb
-            : NIGHT_SKY.rgb
+        let sky_color = this.time > SUNRISE && this.time < SUNSET
+            ? color_fusion(NIGHT_SKY, DAY_SKY, Math.sin(this.sun.angle) * 2)
+            : NIGHT_SKY
+        ctx.fillStyle = add_colors_to_gradient(
+            ctx.createLinearGradient(canvas.width / 2, 0, canvas.width / 2, this.ground_level),
+            [sky_color.multiply(1.5), sky_color.multiply(1)]
+        )
         ctx.fillRect(0, 0, canvas.width, this.ground_level)
 
         // Sun & Moon

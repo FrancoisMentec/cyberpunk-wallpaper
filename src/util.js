@@ -1,3 +1,7 @@
+function clamp (number, min, max) {
+    return Math.min(Math.max(number, min), max)
+}
+
 function random () {
     return Math.random()
 }
@@ -11,6 +15,8 @@ function random_int (a, b, normal=false) {
             max = b
         } else max = a
     } else throw new Error('a is required')
+    if (min == max) return min
+    else if (min > max) throw new Error(`min (${min}) > max (${max})`)
     let r = normal
         ? random_bm()
         : Math.random()
