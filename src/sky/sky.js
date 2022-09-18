@@ -8,21 +8,21 @@ class Sky {
         this.sun = new Orbiter({
             orbit_center_x: canvas.width / 2,
             orbit_center_y: ground_level,
-            orbit_radius: Math.min(width / 2 - 40, ground_level - config.sky.sun_radius - 20),
+            orbit_radius: Math.min(width / 2 - 40, ground_level - config.sun_radius - 20),
             starting_angle: Math.PI,
             speed: orbiter_speed,
-            fill: config.sky.sun_fill,
-            radius: config.sky.sun_radius
+            fill: config.sun_fill,
+            radius: config.sun_radius
         })
 
         this.moon = new Orbiter({
             orbit_center_x: canvas.width / 2,
             orbit_center_y: ground_level,
-            orbit_radius: Math.min(canvas.width / 2 - 80, ground_level - config.sky.moon_radius - 20),
+            orbit_radius: Math.min(canvas.width / 2 - 80, ground_level - config.moon_radius - 20),
             starting_angle: 0,
             speed: orbiter_speed,
-            fill: config.sky.moon_fill,
-            radius: config.sky.moon_radius
+            fill: config.moon_fill,
+            radius: config.moon_radius
         })
 
         this.stars = []
@@ -55,16 +55,18 @@ class Sky {
 
         // Background
         let sky_color = scene.is_day
-            ? color_fusion(config.sky.night_sky, config.sky.day_sky, scene.luminosity)
-            : config.sky.night_sky
-        let sky_gradient = [sky_color.multiply(1.5), sky_color.multiply(1.2), sky_color.multiply(1.1), sky_color]
+            ? color_fusion(config.night_sky, config.day_sky, scene.luminosity)
+            : config.night_sky
+        fill_rect(ctx, 0, 0, canvas.width, scene.ground_level, [sky_color.multiply(1.5), sky_color], 'top', 'bottom')
+        
+        // Twilight
         if (scene.is_dawn)
-            sky_gradient.push(color_fusion(sky_color, config.sky.dawn_sky, normal((scene.time - SUNRISE) * 4 / SECONDS_IN_AN_HOUR - 4, 1, 0) * 2.5))
+            fill_rect(ctx, 0, scene.ground_level - config.dawn_height, canvas.width, config.dawn_height,
+                [sky_color.alpha(0), config.dawn_sky.alpha(normal((scene.time - SUNRISE) * 4 / SECONDS_IN_AN_HOUR - 4, 1, 0) * 2.5)], 'top', 'bottom')
         else if (scene.is_dusk)
-            sky_gradient.push(color_fusion(sky_color, config.sky.dusk_sky, 
-                normal((scene.time - (SUNSET - 2 * SECONDS_IN_AN_HOUR)) * 4 / SECONDS_IN_AN_HOUR - 4, 1, 0) * 2.5))
-        else sky_gradient.push(sky_color)
-        fill_rect(ctx, 0, 0, canvas.width, scene.ground_level, sky_gradient, 'top', 'bottom')
+            fill_rect(ctx, 0, scene.ground_level - config.dusk_height, canvas.width, config.dusk_height,
+                [sky_color.alpha(0), config.dusk_sky.alpha(
+                    normal((scene.time - (SUNSET - 2 * SECONDS_IN_AN_HOUR)) * 4 / SECONDS_IN_AN_HOUR - 4, 1, 0) * 2.5)], 'top', 'bottom')
 
         // Stars
         if (scene.is_night) {

@@ -11,15 +11,16 @@ const NIGHT_WATER = new Color({ hex: '#162236' })
 class Scene {
     constructor ({
         width,
+        height,
         ground_level,
         ground_height = 5
     }) {
-        this.ground_level = ground_level
+        this.height = height
         this.ground_height = ground_height
 
         this.sky = new Sky({
             width,
-            ground_level
+            ground_level: this.ground_level
         })
 
         this.buildings_skyline = new Buildings_Skyline({
@@ -78,13 +79,16 @@ class Scene {
         return 1
     }
 
+    get ground_level () {
+        return this.height * config.ground_level
+    }
+
     async draw ({
         ctx,
         canvas
     }) {
+        ctx.fillStyle = 'white'
         ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-        this.time = (this.time + config.seconds_per_tick) % SECONDS_IN_A_DAY
 
         let draw_arguments = {
             ...arguments[0],

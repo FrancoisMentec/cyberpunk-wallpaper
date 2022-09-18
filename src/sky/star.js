@@ -2,7 +2,7 @@ class Star {
     constructor ({
         width,
         height,
-        color = config.sky.star_color
+        color = config.star_color
     }) {
         this.x = random_int(width)
         this.y = random_int(height)

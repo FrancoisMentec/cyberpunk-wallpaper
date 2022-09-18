@@ -6,7 +6,7 @@ class Windows_Panel {
         this.building_part = building_part
         this.light_color = light_color
 
-        if (this.building_part.width > config.windows.min_margin * 2)
+        if (this.building_part.width > config.windows_min_margin * 2)
             this.make_panel()
     }
 
@@ -22,8 +22,8 @@ class Windows_Panel {
         let full_width = Math.random() > 0.7
 
         this.min_margin = full_width
-            ? random_int(config.windows.min_margin, 5)
-            : random_int(config.windows.min_margin, 10)
+            ? random_int(config.windows_min_margin, 5)
+            : random_int(config.windows_min_margin, 10)
         this.windows_width = full_width
             ? this.width - this.min_margin * 2 // full width windows
             : random_int(3,  clamp(this.width - this.min_margin * 2, 6, 20))

@@ -1,25 +1,27 @@
 let config = {
-    sky: {
-        day_sky: new Color({ hex: '#4e5dfc' }),
-        night_sky: new Color({ hex: '#030733' }),
-        dawn_sky: new Color({ hex: '#ee0979' }),
-        dusk_sky: new Color({ hex: '#ee0979' }),
-        sun_radius: 30,
-        sun_fill: new Color({ hex: '#FFFF00' }),
-        moon_radius: 60,
-        moon_fill: ['#e6eced', '#616566'],
-        star_color: new Color({ hex: '#FFFF00' })
-    },
-    windows: {
-        min_margin: 3
-    },
-    seconds_per_tick: 60,
+    // Sky
+    day_sky: new Color({ hex: '#4e5dfc' }),
+    night_sky: new Color({ hex: '#030733' }),
+    dawn_sky: new Color({ hex: '#ee0979' }),
+    dawn_height: 300,
+    dusk_sky: new Color({ hex: '#ee0979' }),
+    dusk_height: 300,
+    sun_radius: 30,
+    sun_fill: new Color({ hex: '#FFFF00' }),
+    moon_radius: 60,
+    moon_fill: ['#e6eced', '#616566'],
+    star_color: new Color({ hex: '#FFFF00' }),
+    // Windows
+    windows_min_margin: 3,
+    // Other
+    fps: 0,
+    seconds_per_seconds: 60 * 60, // Fake seconds per real seconds
     ground_level: .66
 }
 
 window.wallpaperPropertyListener = {
     applyUserProperties: (properties) => {
-        if (properties.seconds_per_tick) config.seconds_per_tick = properties.seconds_per_tick.value
+        if (properties.seconds_per_seconds) config.seconds_per_seconds = properties.seconds_per_seconds.value
     }
 }
 
@@ -46,21 +48,30 @@ resize_canvas()
 function generate () {
     window.scene = new Scene({
         width: canvas.width,
-        ground_level: canvas.height * config.ground_level
+        height: canvas.height
     })
 }
 
 generate()
 
+let last_tick = performance.now()
+let fps_threshold = 0
+
 function draw () {
-    //ctx.save()
+    requestAnimationFrame(draw)
+
+    // fps limitation
+    let now = performance.now()
+    if (config.fps > 0 && now - last_tick < 1000 / config.fps) return
+    scene.time = (scene.time + (now - last_tick) * config.seconds_per_seconds / 1000) % SECONDS_IN_A_DAY // Update time
+    last_tick = now
+
+    ctx.save()
     scene.draw({
         ctx: ctx,
         canvas: canvas
     })
-    //ctx.restore()
-
-    requestAnimationFrame(draw)
+    ctx.restore()
 }
 
 requestAnimationFrame(draw)
