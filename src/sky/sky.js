@@ -31,6 +31,18 @@ class Sky {
                 width,
                 height: ground_level
             }))
+        
+        this.make_stars_image()
+    }
+
+    async make_stars_image () {
+        stars_ctx.fillStyle = 'transparent'
+        stars_ctx.clearRect(0, 0, stars_canvas.width, stars_canvas.height)
+        this.stars.forEach(star => star.draw({
+            ctx: stars_ctx,
+            alpha: 1
+        }))
+        this.stars_image = await createImageBitmap(stars_canvas, 0, 0, stars_canvas.width, stars_canvas.height)
     }
 
     draw ({
@@ -45,7 +57,7 @@ class Sky {
         let sky_color = scene.is_day
             ? color_fusion(config.sky.night_sky, config.sky.day_sky, scene.luminosity)
             : config.sky.night_sky
-        let sky_gradient = [sky_color.multiply(1.5), sky_color.multiply(1.2), sky_color]
+        let sky_gradient = [sky_color.multiply(1.5), sky_color.multiply(1.2), sky_color.multiply(1.1), sky_color]
         if (scene.is_dawn)
             sky_gradient.push(color_fusion(sky_color, config.sky.dawn_sky, normal((scene.time - SUNRISE) * 4 / SECONDS_IN_AN_HOUR - 4, 1, 0) * 2.5))
         else if (scene.is_dusk)
@@ -56,16 +68,12 @@ class Sky {
 
         // Stars
         if (scene.is_night) {
-            let stars_alpha = 1
             if (scene.time >= SUNRISE - 2 * SECONDS_IN_AN_HOUR && scene.time <= SUNRISE)
-                stars_alpha = -1 * (scene.time - (SUNRISE - 2 * SECONDS_IN_AN_HOUR)) / (2 * SECONDS_IN_AN_HOUR) + 1
+                ctx.globalAlpha = -1 * (scene.time - (SUNRISE - 2 * SECONDS_IN_AN_HOUR)) / (2 * SECONDS_IN_AN_HOUR) + 1
             else if (scene.time >= SUNSET && scene.time <= SUNSET + 2 * SECONDS_IN_AN_HOUR)
-                stars_alpha = (scene.time - SUNSET) / (2 * SECONDS_IN_AN_HOUR)
-                
-            this.stars.forEach(star => star.draw({
-                ...arguments[0],
-                alpha: stars_alpha
-            }))
+                ctx.globalAlpha = (scene.time - SUNSET) / (2 * SECONDS_IN_AN_HOUR)
+            ctx.drawImage(this.stars_image, 0, 0)
+            ctx.globalAlpha = 1
         }
 
         // Sun & Moon

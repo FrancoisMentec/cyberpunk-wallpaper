@@ -2,8 +2,8 @@ class Buildings_Skyline {
     constructor ({
         width,
         ground_level,
-        min_heigth = 100,
-        max_heigth = 150,
+        min_heigth = 30,
+        max_heigth = 80,
         min_building_width = 10,
         max_building_width = 100,
         color = '#222222'
@@ -20,7 +20,6 @@ class Buildings_Skyline {
                 height: random_int(min_heigth, max_heigth),
             }
             this.buildings.push(building)
-            if (building.width <= 0) throw new Error(`WTF`)
             current_width += building.width
         }
     }
