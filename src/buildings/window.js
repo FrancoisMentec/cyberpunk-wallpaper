@@ -27,7 +27,7 @@ class Window {
         scene,
     }) {
         // Light change
-        this.time_until_light_change -= scene.seconds_per_tick
+        this.time_until_light_change -= config.seconds_per_tick
         if (this.time_until_light_change <= 0) {
             if (scene.is_day) this.light = Math.random() > 0.9
             else if (scene.is_twilight)  this.light = Math.random() > 0.2

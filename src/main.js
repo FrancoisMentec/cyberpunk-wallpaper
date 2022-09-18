@@ -13,7 +13,14 @@ let config = {
     windows: {
         min_margin: 3
     },
+    seconds_per_tick: 60,
     ground_level: .66
+}
+
+window.wallpaperPropertyListener = {
+    applyUserProperties: (properties) => {
+        if (properties.seconds_per_tick) config.seconds_per_tick = properties.seconds_per_tick.value
+    }
 }
 
 let canvas = document.getElementById('canvas')

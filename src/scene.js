@@ -42,8 +42,8 @@ class Scene {
             ground_level: this.buildings_level
         }))
 
-        this.seconds_per_tick = 60
-        this.time = SUNSET - 3 * SECONDS_IN_AN_HOUR
+        this.time = NOON
+        //this.time = SUNSET - 3 * SECONDS_IN_AN_HOUR
         //this.time = SUNRISE - SECONDS_IN_AN_HOUR
     }
 
@@ -84,7 +84,7 @@ class Scene {
     }) {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-        this.time = (this.time + this.seconds_per_tick) % SECONDS_IN_A_DAY
+        this.time = (this.time + config.seconds_per_tick) % SECONDS_IN_A_DAY
 
         let draw_arguments = {
             ...arguments[0],

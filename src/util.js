@@ -44,7 +44,6 @@ function make_gradient (ctx, x, y, width, height, fill, from='top left', to='bot
             : to.includes('bottom')
                 ? y + height
                 : y + height / 2)
-    
     return add_colors_to_gradient(gradient, fill)
 }
 
