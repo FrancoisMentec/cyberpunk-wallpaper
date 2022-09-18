@@ -54,6 +54,12 @@ class Color {
     }
 }
 
+function rgba (color) {
+    return color instanceof Color
+        ? color.rgba
+        : color
+}
+
 function color_fusion (color_a, color_b, balance) {
     if (balance <= 0) return color_a
     else if (balance >= 1) return color_b

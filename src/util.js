@@ -22,12 +22,41 @@ function random_bool () {
     return Math.random() >= 0.5
 }
 
-function fill_rect (ctx, x, y, width, height, fill) {
-    if (Array.isArray(fill)) {
-        let gradient = ctx.createLinearGradient(x, y, x + width, y + height)
-        ctx.fillStyle = add_colors_to_gradient(gradient, fill)
-    } else ctx.fillStyle = fill instanceof Color
-        ? fill.rgba
-        : fill
+function make_gradient (ctx, x, y, width, height, fill, from='top left', to='bottom right') {
+    let gradient = ctx.createLinearGradient(
+        from.includes('left')
+            ? x
+            : from.includes('right')
+                ? x + width
+                : x + width / 2,
+        from.includes('top')
+            ? y
+            : from.includes('bottom')
+                ? y + height
+                : y + height / 2,
+        to.includes('left')
+            ? x
+            : to.includes('right')
+                ? x + width
+                : x + width / 2,
+        to.includes('top')
+            ? y
+            : to.includes('bottom')
+                ? y + height
+                : y + height / 2)
+    
+    return add_colors_to_gradient(gradient, fill)
+}
+
+function fill_rect (ctx, x, y, width, height, fill, from='top left', to='bottom right') {
+    ctx.fillStyle = Array.isArray(fill)
+        ? make_gradient(ctx, x, y, width, height, fill, from, to)
+        : fill instanceof Color
+            ? fill.rgba
+            : fill
     ctx.fillRect(x, y, width, height)
+}
+
+function normal (x, std, mean) {
+    return (1 / (std * Math.sqrt(2 * Math.PI))) * Math.exp(-.5*((x-mean) / std) ** 2)
 }

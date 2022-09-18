@@ -5,9 +5,7 @@ class Regular_Building extends Building {
         this.make_part({
             width: random_int(30, 100),
             height: random_int(20, 60),
-            cap_height: random_int(2, 5),
-            front_fill: 'red',
-            cap_fill: 'green'
+            //cap_height: random_int(2, 5),
         })
     }
 }

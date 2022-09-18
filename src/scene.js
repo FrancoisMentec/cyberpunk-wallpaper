@@ -5,9 +5,6 @@ const NOON = SUNRISE + SECONDS_IN_A_DAY / 4
 const SUNSET = SUNRISE + SECONDS_IN_A_DAY / 2
 const MIDNIGHT = SUNSET + SECONDS_IN_A_DAY / 4
 
-const DAY_SKY = new Color({ hex: '#4e5dfc' })
-const NIGHT_SKY = new Color({ hex: '#030733' })
-
 const DAY_WATER = new Color({ hex: '#3d66a8' })
 const NIGHT_WATER = new Color({ hex: '#162236' })
 
@@ -19,6 +16,11 @@ class Scene {
     }) {
         this.ground_level = ground_level
         this.ground_height = ground_height
+
+        this.sky = new Sky({
+            width,
+            ground_level
+        })
 
         this.buildings_skyline = new Buildings_Skyline({
             width: width,
@@ -40,42 +42,49 @@ class Scene {
             ground_level: this.buildings_level
         }))
 
-        let orbiter_speed = 0.005
-
-        this.sun = new Orbiter({
-            orbit_center_x: canvas.width / 2,
-            orbit_center_y: this.ground_level,
-            orbit_radius: Math.min(canvas.width / 2 - 40, this.ground_level - config.sun_radius - 20),
-            starting_angle: Math.PI,
-            speed: orbiter_speed,
-            color: 'yellow',
-            radius: config.sun_radius
-        })
-
-        this.moon = new Orbiter({
-            orbit_center_x: canvas.width / 2,
-            orbit_center_y: this.ground_level,
-            orbit_radius: Math.min(canvas.width / 2 - 80, this.ground_level - config.moon_radius - 20),
-            starting_angle: 0,
-            speed: orbiter_speed,
-            color: 'gray',
-            radius: config.moon_radius
-        })
-
-        this.time = NOON
+        this.seconds_per_tick = 60
+        this.time = SUNSET - 3 * SECONDS_IN_AN_HOUR
+        //this.time = SUNRISE - SECONDS_IN_AN_HOUR
     }
 
     get buildings_level () {
         return this.ground_level - this.ground_height
     }
 
+    get is_day () {
+        return this.time > SUNRISE && this.time < SUNSET
+    }
+
+    get is_night () {
+        return !this.is_day
+    }
+
+    get is_dawn () {
+        return this.time > SUNRISE && this.time < SUNRISE + 2 * SECONDS_IN_AN_HOUR
+    }
+
+    get is_dusk () {
+        return this.time > SUNSET - 2 * SECONDS_IN_AN_HOUR && this.time < SUNSET
+    }
+
+    get is_twilight () {
+        return this.is_dawn || this.is_dusk
+    }
+
+    get luminosity () {
+        if (this.time < SUNRISE || this.time > SUNSET) return 0
+        if (this.time < SUNRISE + 2 * SECONDS_IN_AN_HOUR) return (this.time - SUNRISE) / (2 * SECONDS_IN_AN_HOUR)
+        if (this.time > SUNSET - 2 * SECONDS_IN_AN_HOUR) return -1 * (this.time - (SUNSET - 2 * SECONDS_IN_AN_HOUR)) / (2 * SECONDS_IN_AN_HOUR) + 1
+        return 1
+    }
+
     async draw ({
         ctx,
         canvas
     }) {
-        this.time = (this.time + 60) % SECONDS_IN_A_DAY
-        this.sun.angle = ((this.time - SUNRISE) / SECONDS_IN_A_DAY) * Math.PI * -2 + Math.PI
-        this.moon.angle = ((this.time - SUNRISE + SECONDS_IN_A_DAY / 2) / SECONDS_IN_A_DAY) * Math.PI * -2 + Math.PI
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+        this.time = (this.time + this.seconds_per_tick) % SECONDS_IN_A_DAY
 
         let draw_arguments = {
             ...arguments[0],
@@ -83,18 +92,7 @@ class Scene {
         }
 
         // Sky
-        let sky_color = this.time > SUNRISE && this.time < SUNSET
-            ? color_fusion(NIGHT_SKY, DAY_SKY, Math.sin(this.sun.angle) * 2)
-            : NIGHT_SKY
-        ctx.fillStyle = add_colors_to_gradient(
-            ctx.createLinearGradient(canvas.width / 2, 0, canvas.width / 2, this.ground_level),
-            [sky_color.multiply(1.5), sky_color.multiply(1)]
-        )
-        ctx.fillRect(0, 0, canvas.width, this.ground_level)
-
-        // Sun & Moon
-        this.sun.draw(draw_arguments)
-        this.moon.draw(draw_arguments)
+        this.sky.draw(draw_arguments)
 
         // Buildings Skyline
         this.buildings_skyline.draw(draw_arguments)
@@ -108,28 +106,24 @@ class Scene {
 
         // Ground
         ctx.fillStyle = '#444444'
-        ctx.fillRect(0, this.buildings_level - 1, canvas.width, this.ground_height + 2)
+        ctx.fillRect(0, this.buildings_level, canvas.width, this.ground_height + 2)
 
 
         // Prevent see through blur (can be used to add a color close to shore)
         let water_color = this.time > SUNRISE && this.time < SUNSET
-            ? color_fusion(NIGHT_WATER, DAY_WATER, Math.sin(this.sun.angle) * 2)
+            ? color_fusion(NIGHT_WATER, DAY_WATER, Math.sin(this.sky.sun.angle) * 2)
             : NIGHT_WATER
         ctx.fillStyle = water_color.rgb
-        ctx.fillRect(0, this.ground_level, canvas.width, 20)
+        ctx.fillRect(0, this.ground_level + 1, canvas.width, 20)
 
         // Reflection
-        let image = await createImageBitmap(canvas, 0, canvas.height - this.ground_level, canvas.width, canvas.height - this.ground_level, { imageOrientation: 'flipY' })
+        let image = await createImageBitmap(canvas, 0, 0, canvas.width, this.ground_level, { imageOrientation: 'flipY' })
         ctx.filter = 'blur(6px)'
-        ctx.drawImage(image, 0, this.ground_level)
+        ctx.drawImage(image, 0, this.ground_level + 1)
         ctx.filter = 'none'
 
         // Water
-        let gradient = ctx.createLinearGradient(canvas.width / 2, this.ground_level, canvas.width / 2, canvas.height)
-        gradient.addColorStop(0, water_color.alpha(0.3).rgba)
-        gradient.addColorStop(0.5, water_color.alpha(0.9).rgba)
-        gradient.addColorStop(1, water_color.alpha(1).rgba)
-        ctx.fillStyle = gradient
-        ctx.fillRect(0, this.ground_level, canvas.width, canvas.height - this.ground_level)
+        fill_rect(ctx, 0, this.ground_level + 1, canvas.width, canvas.height - this.ground_level - 1,
+            [water_color.alpha(0.3).rgba, water_color.alpha(0.9).rgba, water_color.alpha(1).rgba], 'top', 'bottom')
     }
 }

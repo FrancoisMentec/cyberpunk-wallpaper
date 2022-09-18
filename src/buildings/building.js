@@ -70,7 +70,7 @@ class Building {
                 x: this.x,
                 y: y
             })
-            y -= part.height
+            y -= part.total_height
         }
     }
 }

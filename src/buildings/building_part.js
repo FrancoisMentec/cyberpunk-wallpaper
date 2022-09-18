@@ -1,3 +1,5 @@
+const CAP_Y_OFFSET = 1 // To correct the weird transparency border
+
 class Building_Part {
     constructor ({
         width,
@@ -8,7 +10,6 @@ class Building_Part {
         side_fill = ['#e1eec3', '#f05053'],
         windows_light_color = 'yellow',
         x_offset = 0,
-        cap_height = 0,
         cap_fill = null
     }) {
         this.width = width
@@ -28,7 +29,9 @@ class Building_Part {
 
         this.x_offset = x_offset
 
-        this.cap_height = cap_height
+        this.cap_height = typeof cap_height == 'number'
+            ? cap_height
+            : random_int(1, Math.min(5, this.depth / 2))
         this.cap_fill = cap_fill == null
             ? Array.isArray(this.side_fill)
                 ? this.side_fill[0]
@@ -41,7 +44,7 @@ class Building_Part {
     }
 
     get total_height () {
-        return this.height + this.cap_height
+        return this.height + this.cap_height - CAP_Y_OFFSET
     }
 
     draw ({
@@ -58,8 +61,11 @@ class Building_Part {
         y -= this.height
 
         // Shadow
-        let shadow_width = Math.max(1, this.depth * (((Math.cos(scene.sun.angle) * -1) + 1) / 2))
-        fill_rect(ctx, front_x + this.width, y, shadow_width, this.height, ['rgba(0,0,0,0.6)', 'transparent']);
+        /*let shadow_width = scene.time >= SUNRISE && scene.time <= NOON
+            ? Math.max(1, this.depth / 3 * (1 - ((scene.time - SUNRISE) / (NOON - SUNRISE))))
+            : 1
+        fill_rect(ctx, front_x + this.width, y - this.cap_height, shadow_width, this.total_height, ['rgba(0,0,0,0.6)', 'transparent'])*/
+        fill_rect(ctx, front_x + this.width, y - this.cap_height, 1, this.total_height, 'rgba(0,0,0,0.6)')
 
         // Side
         if (this.depth > 0)
@@ -76,7 +82,9 @@ class Building_Part {
         })
 
         // Cap
-        if (this.cap_height > 0)
-            fill_rect(ctx, side_x, y - this.cap_height, this.total_width, this.cap_height, this.cap_fill)
+        if (this.cap_height > 0) {
+            fill_rect(ctx, side_x, y - this.cap_height + CAP_Y_OFFSET, this.total_width, this.cap_height, this.cap_fill)
+        }  
+            
     }
 }

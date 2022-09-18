@@ -15,6 +15,8 @@ class Window {
         this.light_color = light_color
 
         this.light = null
+
+        this.time_until_light_change = 0
     }
 
     draw ({
@@ -24,14 +26,14 @@ class Window {
         y,
         scene,
     }) {
-        //if (random() > 0.9999) this.light = !this.light
-        this.light = this.light == null || random() > 0.9999
-            ? scene.time > SUNRISE && scene.time < SUNSET
-                ? random() > 0.9
-                : random() > 0.2
-            : random() > 0.9999
-                ? !this.light
-                : this.light
+        // Light change
+        this.time_until_light_change -= scene.seconds_per_tick
+        if (this.time_until_light_change <= 0) {
+            if (scene.is_day) this.light = Math.random() > 0.9
+            else if (scene.is_twilight)  this.light = Math.random() > 0.2
+            else this.light = Math.random() > 0.6
+            this.time_until_light_change = random_int(.5 * SECONDS_IN_AN_HOUR, 24 * SECONDS_IN_AN_HOUR)
+        }
 
         ctx.fillStyle = this.light
             ? this.light_color

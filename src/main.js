@@ -1,6 +1,15 @@
 let config = {
-    sun_radius: 30,
-    moon_radius: 60,
+    sky: {
+        day_sky: new Color({ hex: '#4e5dfc' }),
+        night_sky: new Color({ hex: '#030733' }),
+        dawn_sky: new Color({ hex: '#ff0000' }),
+        dusk_sky: new Color({ hex: '#ff0000' }),
+        sun_radius: 30,
+        sun_fill: new Color({ hex: '#FFFF00' }),
+        moon_radius: 60,
+        moon_fill: ['#e6eced', '#616566'],
+        star_color: new Color({ hex: '#FFFF00' })
+    },
     windows: {
         min_margin: 3
     }
@@ -34,6 +43,7 @@ function draw () {
         ctx: ctx,
         canvas: canvas
     })
+
     requestAnimationFrame(draw)
 }
 
